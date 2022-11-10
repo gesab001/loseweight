@@ -3,8 +3,10 @@
 # Import modules for CGI handling 
 import cgi, cgitb 
 import json
+import os
 import subprocess
 # Create instance of FieldStorage 
+
 form = cgi.FieldStorage() 
 
 # Get data from fields
@@ -21,7 +23,7 @@ print ("<title>Hello - Second CGI Program</title>")
 print ("</head>")
 print ("<body>")
 try:
-  path = os.path.join(r"C:\Users\giova\Documents\loseweight", "access_token.json")
+  path = "access_token.json"
   with open(path, "w") as outfile:
     json.dump(jsondata, outfile)
   print ("<h2>Successfully updated access_token to  %s </h2>" % (access_token))  
