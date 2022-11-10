@@ -141,15 +141,15 @@ function saveDataToDropbox (username, jsondata){
 		}
 		
 function loadData(data){
-	var ciphertext = JSON.stringify(data["jesuslovesyou"]);
+	var ciphertext = data["jesuslovesyou"];
 	alert("ciphertext: " +ciphertext);
 	var username =   localStorage.getItem("username");
     var password = localStorage.getItem("password");
-	var secretKey = username + password;
-	alert("secretKey: " + secretKey);
-	var bytes = CryptoJS.AES.decrypt(ciphertext, secretKey);
+	var secretKey = username+password;
+    var bytes = CryptoJS.AES.decrypt(ciphertext.toString(), 'secret');
 	var decrypted_access_token = bytes.toString(CryptoJS.enc.Utf8);
-
+	console.log("decrypted_access_token:" + decrypted_access_token);
+	
     localStorage.setItem("access_token", decrypted_access_token);
 
 	alert("access_token: " + localStorage.getItem("access_token"));
