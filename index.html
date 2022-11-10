@@ -2,18 +2,19 @@
 
 <head>
 
-<script src="cryptojs.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+
 </head>
 
 <body>
 
 <h1>Lose Weight</h1>
 
-<form onsubmit="login()">
+
 <input type="text" id="username" placeholder="Username"/>
 <input type="password" id="password" placeholder="Password"/>
-<input type="submit" value="LOGIN"/>
-</form>
+<button onclick="login()">LOGIN</button>
+
 
 <form onsubmit="addWeight()" >
 <input id="weight" type="number" placeholder="add weight"/>
@@ -33,6 +34,10 @@ function login(){
   console.log("login");
   username = document.getElementById("username").value;
   password = document.getElementById("password").value;
+  localStorage.setItem("username", username);
+  localStorage.setItem("password", password);
+  
+  
   fetchData("access_token.json");
 }
 function addWeight(){
@@ -43,7 +48,7 @@ function addWeight(){
 
 
 }
-function saveDataToDropbox (username, jsondata){
+
 	var html= "";
     /* When the request begins */
     function onloadstarthandler(e) {
@@ -91,17 +96,26 @@ function saveDataToDropbox (username, jsondata){
     function onreadystatechangehandler(e) {
         html = 'onreadystate: ' + JSON.stringify(e);
         console.log(html);
+		alert("successfully saved to dropbox");
     }
+	
+function saveDataToDropbox (username, jsondata){
 
-		   console.log("saveDataToDropbox");
+
+		   alert("saveDataToDropbox");
 
 	       var data = jsondata;
 		   data = JSON.stringify(data);
-		   var path = username+".json";
+		   var username = localStorage.getItem("username");
+		   var path = username + ".json";
 		   //console.log("path: " + path);
 		   //console.log("data: " + data);
 
 		   //alert(data);
+		   alert(data);
+		   alert(path);
+		   var access_token = "sl.BS0XOu4bnj66rhevO5Xz8b4ncIFtNHQfAP1m_yNhj4Ruo0CBT1DIYDROHipwphyfa_ifTGePAlr4bbtPW4b3cQ-SuqGo0edroGkHviL0z-Y-qIPjqUkaIDmclo1qQYEogoNSkWx9";
+		   alert("access_token: " + access_token);
 		   var client = new XMLHttpRequest();
 
 
@@ -127,16 +141,29 @@ function saveDataToDropbox (username, jsondata){
 		}
 		
 function loadData(data){
-    console.log(JSON.stringify(data["access_token"]));
-	var ciphertext = data["access_token"];
-	var bytes = CryptoJS.AES.decrypt(ciphertext.toString(), username+password);
-	var decrypted_access_token = bytes.toString(CryptoJS.enc.Utf8);
+	var ciphertext = JSON.stringify(data["jesuslovesyou"]);
+	alert("ciphertext: " +ciphertext);
+	var username =   localStorage.getItem("username");
+    var password = localStorage.getItem("password");
+    var username = "gesab001";
+	var password = "Bdgqviid1980!loseweight";
+	var secretKey = username + password;
+	alert("secretKey: " + secretKey);
+	//var bytes = CryptoJS.AES.decrypt(ciphertext, secretKey);
+	//var decrypted_access_token = bytes.toString(CryptoJS.enc.Utf8);
+	decrypted_access_token = "sl.BS2tSSgyi-Xkgdso6UioOFV5VlMTeBQkM6FE5KI1C1110ghRDmGTotmbTniQI6qeCwbY8wa0JeBGqSm3hm9vhj3dtYjQXln6anQugKyNOTck781R8lIOvDaYZ5qI3kkAjo97kPuo";
 	console.log("decrypted_access_token:" + decrypted_access_token);	
-	access_token = decrypted_access_token;
+	alert("decrypted_access_token: " + decrypted_access_token);
+    localStorage.setItem("access_token", decrypted_access_token);
+
+	alert("access_token: " + localStorage.getItem("access_token"));
 }
 
 function fetchData(filename){
-	
+  	  alert("fetchData: " + filename);
+
+	  alert("username: " + username);
+  alert("password: " + password);
 fetch(filename)
   .then((response) => response.json())
   .then(loadData);
