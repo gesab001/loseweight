@@ -145,15 +145,11 @@ function loadData(data){
 	alert("ciphertext: " +ciphertext);
 	var username =   localStorage.getItem("username");
     var password = localStorage.getItem("password");
-    var username = "gesab001";
-	var password = "Bdgqviid1980!loseweight";
 	var secretKey = username + password;
 	alert("secretKey: " + secretKey);
-	//var bytes = CryptoJS.AES.decrypt(ciphertext, secretKey);
-	//var decrypted_access_token = bytes.toString(CryptoJS.enc.Utf8);
-	decrypted_access_token = "sl.BS2tSSgyi-Xkgdso6UioOFV5VlMTeBQkM6FE5KI1C1110ghRDmGTotmbTniQI6qeCwbY8wa0JeBGqSm3hm9vhj3dtYjQXln6anQugKyNOTck781R8lIOvDaYZ5qI3kkAjo97kPuo";
-	console.log("decrypted_access_token:" + decrypted_access_token);	
-	alert("decrypted_access_token: " + decrypted_access_token);
+	var bytes = CryptoJS.AES.decrypt(ciphertext, secretKey);
+	var decrypted_access_token = bytes.toString(CryptoJS.enc.Utf8);
+
     localStorage.setItem("access_token", decrypted_access_token);
 
 	alert("access_token: " + localStorage.getItem("access_token"));

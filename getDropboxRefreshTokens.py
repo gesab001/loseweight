@@ -72,8 +72,8 @@ def getAccessToken(refresh_token):
 
 def encryptAccessToken():
   url = "http://localhost:8000/encrypt_access_token.html"
-  openUrl(url)
-  subprocess.call("cd "+appFolder+" && python serve.py", shell=True)
+  #openUrl(url)
+  #subprocess.call("cd "+appFolder+" && python serve.py", shell=True)
   
 getAuthorizationCode()
 auth_code = input("paste authorization code: " )
@@ -96,5 +96,5 @@ def updateAuto(interval):
         print("next update is " + nextUpdate)
         time.sleep(interval)
 
-interval =  240 * 60 # minute * 60 seconds
-updateAuto(interval)
+#interval =  240 * 60 # minute * 60 seconds
+#updateAuto(interval)
