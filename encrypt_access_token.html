@@ -24,7 +24,7 @@ function loadData(data){
     console.log(JSON.stringify(data["access_token"]));
 	var access_token = JSON.stringify(data["access_token"]);
 	console.log("original access_token: " + access_token);
-	var ciphertext = CryptoJS.AES.encrypt(access_token, 'u4ElHXgHMN');
+	var ciphertext = CryptoJS.AES.encrypt(access_token, 'gesab001Bdgqviid1980!loseweight');
 	document.getElementById("access_tokenInput").value = ciphertext;
 	console.log("encrypted access_token: " + ciphertext);
 	//alert(ciphertext);

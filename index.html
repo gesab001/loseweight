@@ -1,12 +1,22 @@
 <html>
 
+<head>
+
+<script src="cryptojs.js"></script>
+</head>
 
 <body>
 
 <h1>Lose Weight</h1>
 
+<form onsubmit="login()">
+<input type="text" id="username" placeholder="Username"/>
+<input type="password" id="password" placeholder="Password"/>
+<input type="submit" value="LOGIN"/>
+</form>
+
 <form onsubmit="addWeight()" >
-<input type="number" placeholder="add weight"/>
+<input id="weight" type="number" placeholder="add weight"/>
 <input type="submit" value="SUBMIT"/>
 </form>
 
@@ -15,6 +25,124 @@
 </body>
 
 <script>
+
+var username;
+var password;
+var access_token;
+function login(){
+  console.log("login");
+  username = document.getElementById("username").value;
+  password = document.getElementById("password").value;
+  fetchData("access_token.json");
+}
+function addWeight(){
+   var newWeight = document.getElementById("weight").value;
+   var jsondata = {"weight": newWeight};
+   saveDataToDropbox (username, jsondata);
+
+
+
+}
+function saveDataToDropbox (username, jsondata){
+	var html= "";
+    /* When the request begins */
+    function onloadstarthandler(e) {
+    //   html = 'onreadystate: ' + JSON.stringify(e);
+        //console.log(html);
+    }
+
+    /* When the request is in progress */
+    function onprogresshandler(e) {
+     //   html = 'onreadystate: ' + JSON.stringify(e);
+        //console.log(html);
+    }
+
+    /* When the client cancels the request */
+    function onaborthandler(e) {
+     //   html = 'onreadystate: ' + JSON.stringify(e);
+        //console.log(html);
+    }
+
+    /* When server exception occurs */
+    function onerrorhandler(e) {
+      //  html = 'onreadystate: ' + JSON.stringify(e);
+        //console.log(html);
+    }
+
+    /* When the request is successfully terminated */
+    function onloadhandler(e) {
+      //  html = 'onreadystate: ' + JSON.stringify(e);
+        //console.log(html);
+    }
+
+    /* When a timeout occurs */
+    function ontimeouthandler(e) {
+       // html = 'onreadystate: ' + JSON.stringify(e);
+        //console.log(html);
+    }
+
+    /* When request is terminated regardless of success or failure */
+    function onloadendhandler(e) {
+       // html = 'onreadystate: ' + JSON.stringify(e);
+        //console.log(html);
+    }
+
+    /* Checks current progress based on a random repetition period */
+    function onreadystatechangehandler(e) {
+        html = 'onreadystate: ' + JSON.stringify(e);
+        console.log(html);
+    }
+
+		   console.log("saveDataToDropbox");
+
+	       var data = jsondata;
+		   data = JSON.stringify(data);
+		   var path = username+".json";
+		   //console.log("path: " + path);
+		   //console.log("data: " + data);
+
+		   //alert(data);
+		   var client = new XMLHttpRequest();
+
+
+		    
+		    client.onloadstart = onloadstarthandler;
+		    client.onprogress = onprogresshandler;
+		    client.onabort = onaborthandler;
+		    client.onerror = onerrorhandler;
+		    client.onload = onloadhandler;
+		    client.ontimeout = ontimeouthandler;
+		    client.onloadend = onloadendhandler;
+		    client.onreadystatechange = onreadystatechangehandler;
+
+		    client.open("post", "https://content.dropboxapi.com/2/files/upload", true);
+
+				    client.setRequestHeader("Authorization", "Bearer " + access_token); 
+				    client.setRequestHeader("Dropbox-API-Arg", "{\"path\": \"/"+path+"\",\"mode\": \"overwrite\",\"autorename\": true,\"mute\": false,\"strict_conflict\": false}");
+				    client.setRequestHeader("Content-Type", "application/octet-stream");
+
+				    client.send(data);
+		    
+
+		}
+		
+function loadData(data){
+    console.log(JSON.stringify(data["access_token"]));
+	var ciphertext = data["access_token"];
+	var bytes = CryptoJS.AES.decrypt(ciphertext.toString(), username+password);
+	var decrypted_access_token = bytes.toString(CryptoJS.enc.Utf8);
+	console.log("decrypted_access_token:" + decrypted_access_token);	
+	access_token = decrypted_access_token;
+}
+
+function fetchData(filename){
+	
+fetch(filename)
+  .then((response) => response.json())
+  .then(loadData);
+  
+}
+
 
 </script>
 </html>
