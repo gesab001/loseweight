@@ -3,7 +3,6 @@
 <head>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
-
 </head>
 
 <body>
@@ -16,10 +15,8 @@
 <button onclick="login()">LOGIN</button>
 
 
-<form onsubmit="addWeight()" >
 <input id="weight" type="number" placeholder="add weight"/>
-<input type="submit" value="SUBMIT"/>
-</form>
+<button onclick="addWeight()">submit</button>
 
 
 
@@ -114,7 +111,7 @@ function saveDataToDropbox (username, jsondata){
 		   //alert(data);
 		   alert(data);
 		   alert(path);
-		   var access_token = "sl.BS0XOu4bnj66rhevO5Xz8b4ncIFtNHQfAP1m_yNhj4Ruo0CBT1DIYDROHipwphyfa_ifTGePAlr4bbtPW4b3cQ-SuqGo0edroGkHviL0z-Y-qIPjqUkaIDmclo1qQYEogoNSkWx9";
+		   var access_token = localStorage.getItem("access_token");
 		   alert("access_token: " + access_token);
 		   var client = new XMLHttpRequest();
 
@@ -143,13 +140,13 @@ function saveDataToDropbox (username, jsondata){
 function loadData(data){
 	var ciphertext = data["jesuslovesyou"];
 	alert("ciphertext: " +ciphertext);
+	console.log("ciphertext: " + ciphertext);
 	var username =   localStorage.getItem("username");
     var password = localStorage.getItem("password");
 	var secretKey = username+password;
-    var bytes = CryptoJS.AES.decrypt(ciphertext.toString(), 'secret');
+    var bytes = CryptoJS.AES.decrypt(ciphertext, secretKey);
 	var decrypted_access_token = bytes.toString(CryptoJS.enc.Utf8);
 	console.log("decrypted_access_token:" + decrypted_access_token);
-	
     localStorage.setItem("access_token", decrypted_access_token);
 
 	alert("access_token: " + localStorage.getItem("access_token"));

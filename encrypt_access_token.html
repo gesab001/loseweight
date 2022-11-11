@@ -32,7 +32,7 @@ function loadData(data){
 	console.log("encrypted access_token: " + ciphertext);
 	//alert(ciphertext);
 	document.getElementById("access_token").innerHTML = ciphertext;
-	var bytes = CryptoJS.AES.decrypt(ciphertext.toString(), 'secret');
+	var bytes = CryptoJS.AES.decrypt(ciphertext.toString(), secretKey);
 	var decrypted_access_token = bytes.toString(CryptoJS.enc.Utf8);
 	console.log("decrypted_access_token:" + decrypted_access_token);	
 }
