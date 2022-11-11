@@ -81,7 +81,7 @@ function getFilesFromDropbox(key_to_dropbox, callback){
       xhttp.send('{}');
 
 }
-function getWeightList(callback, key_to_dropbox){
+function getFileContentFromDropboxFile(callback, key_to_dropbox, path){
 
    var xhttp = new XMLHttpRequest();
    
@@ -90,11 +90,6 @@ function getWeightList(callback, key_to_dropbox){
 	    callback(this.responseText);
 	 }
    };  
-   
-
-		   var username = localStorage.getItem("username");
-		   var password = localStorage.getItem("password");
-		   var path = username +".json";
 		   console.log("path: " + path);
 		   console.log("key_to_dropbox: "+ key_to_dropbox);
 		   
@@ -124,7 +119,7 @@ function addWeight(){
       console.log(data);
 	  if (data.length>0){
 	     console.log("file exists");
-		 getWeightList(callbackWeightList, key_to_dropbox);
+		 getFileContentFromDropboxFile(callbackWeightList, key_to_dropbox, path);
 	  }else{
 	     console.log("file doesn't exists");
 		 var jsondata = {"items": [newRecord]};  	
