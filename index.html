@@ -15,7 +15,7 @@
 <button onclick="login()">LOGIN</button>
 
 
-<input id="weight" type="number" placeholder="add weight"/>
+<input id="weight" type="number" step="0.01" placeholder="add weight"/>
 <button onclick="addWeight()">submit</button>
 
 
@@ -26,12 +26,29 @@
 
 var username;
 var password;
+
+function autoLogin(){
+  if (localStorage.getItem("username_loseweight") !== null) {
+
+    username = localStorage.getItem("username_loseweight");
+    password = localStorage.getItem("password_loseweight"); 
+	document.getElementById("username").value = username ;
+    document.getElementById("password").value = password ;
+    getAccessToken("access_token.json");
+	}
+
+
+}
+
+autoLogin();
 function login(){
   console.log("login");
-  username = document.getElementById("username").value;
-  password = document.getElementById("password").value;
-  localStorage.setItem("username_loseweight", username);
-  localStorage.setItem("password_loseweight", password);
+    username = document.getElementById("username").value;
+    password = document.getElementById("password").value;
+    localStorage.setItem("username_loseweight", username);
+    localStorage.setItem("password_loseweight", password);
+ 
+
   getAccessToken("access_token.json");
 
 
@@ -111,6 +128,7 @@ function addWeight(){
       var jsondata;
 	  jsondata = JSON.parse(response);
 	  jsondata["items"].push(newRecord);
+      var path = localStorage.getItem("username") + ".json";;		
       saveDataToDropbox (path, jsondata, key_to_dropbox);
     };		
 	
