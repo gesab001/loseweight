@@ -36,6 +36,27 @@ function login(){
 
 
 }
+function searchForFileInDropbox(filename, key_to_dropbox, callback){
+     var xhttp = new XMLHttpRequest();
+   var url = "https://api.dropboxapi.com/2/files/search_v2";
+   var data = {"query":filename};
+   
+   xhttp.onreadystatechange = function() {
+     if (this.readyState == 4 && this.status == 200){
+	    console.log(this.responseText);
+		var jsondata = JSON.parse(this.responseText)["matches"];
+		callback(jsondata);
+	 }
+   };  
+		   console.log("key_to_dropbox: "+ key_to_dropbox);
+		   
+      xhttp.open("POST", url, true);
+      xhttp.setRequestHeader("Authorization", "Bearer " +key_to_dropbox);
+      xhttp.setRequestHeader("Content-Type", "application/json");
+      xhttp.send(JSON.stringify(data));
+}
+
+ 
 function getFilesFromDropbox(key_to_dropbox, callback){
 /*https://api.dropboxapi.com/2/file_requests/list_v2 \
   --header 'Authorization: Bearer sl.BS5Avg6tbvLLQJUFJAn9Mx3siPLRZP-PwUnHBFAaT7zgOz_bC2zA8JPHzPUoRQBjlbpBu4y9q85PP96l-KZTfyeWnouZ6dXuDyuNu8UY0XcWUO0_cCpm_cpAtgAunf-aw6a20ofP-Ide' \
@@ -85,7 +106,8 @@ function getWeightList(callback, key_to_dropbox){
 }
 
 function addWeight(){
-
+   var filename = localStorage.getItem("username") + ".json";
+   var path = filename;		
    var key_to_dropbox = localStorage.getItem("decrypted_key_to_dropbox").replace(/"/g, "");
    var newWeight = document.getElementById("weight").value;
    var timestamp = Date.now();
@@ -94,25 +116,23 @@ function addWeight(){
       var jsondata;
 	  jsondata = JSON.parse(response);
 	  jsondata["items"].push(newRecord);
-	  saveDataToDropbox (jsondata, key_to_dropbox);
+      saveDataToDropbox (path, jsondata, key_to_dropbox);
     };		
 	
    var checkIfFileExists = function(data){
-      var filename = localStorage.getItem("username") + ".json";
 
       console.log(data);
-	  console.log("filename: " + filename);
-	  if (data.indexOf(filename)!=-1){
+	  if (data.length>0){
 	     console.log("file exists");
 		 getWeightList(callbackWeightList, key_to_dropbox);
 	  }else{
 	     console.log("file doesn't exists");
-		 var jsondata = [newRecord];  	
-         var path = filename;		 
+		 var jsondata = {"items": [newRecord]};  	
+ 
 		 saveDataToDropbox (path, jsondata, key_to_dropbox);
 	  }
    }   
-   getFilesFromDropbox(key_to_dropbox, checkIfFileExists);
+   searchForFileInDropbox(filename, key_to_dropbox, checkIfFileExists);
 }
 
 	var html= "";
