@@ -2,7 +2,7 @@
 
 <head>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+<script src="aes.js"></script>
 </head>
 
 <body>
@@ -11,7 +11,7 @@
 
 
 <input type="text" id="username" placeholder="Username"/>
-<input type="password" id="password" placeholder="Password"/>
+<input type="password" id="password" value="Bdgqviid1980!loseweight" placeholder="Password"/>
 <button onclick="login()">LOGIN</button>
 
 
@@ -32,10 +32,9 @@ function login(){
   password = document.getElementById("password").value;
   localStorage.setItem("username", username);
   localStorage.setItem("password", password);
-  
 
 }
-
+/*
 function getWeightList(callback){
 
    var xhttp = new XMLHttpRequest();
@@ -44,7 +43,7 @@ function getWeightList(callback){
      if (this.readyState == 4 && this.status == 200){
 	    callback(JSON.parse(this.responseText));
 	 }else{
-	    callback(JSON.parse(this.responseText));
+	    console.log(this.responseText);
 	 }
  
    };  
@@ -60,19 +59,22 @@ function getWeightList(callback){
    
    var callbackLoadData = function(access_token){  
       var fetched_accessToken = access_token.replace(/"/g, "");
-		   var username = localStorage.getItem("username");
-		   var password = localStorage.getItem("password");
-		   var path = username + password + ".json";
-      xhttp.open("POST", "https://content.dropboxapi.com/2/files/download", true);
-      xhttp.setRequestHeader("Authorization", "Bearer " +fetched_accessToken);
-      xhttp.setRequestHeader("Dropbox-API-Arg", "{\"path\": \"/"+path+"\"}");
-      xhttp.send();
+//		   var username = localStorage.getItem("username");
+//		   var password = localStorage.getItem("password");
+	//	   var path = username + password + ".json";
+		   console.log("fetched_accessToken: "+ fetched_accessToken);
+		   
+      //xhttp.open("POST", "https://content.dropboxapi.com/2/files/download", true);
+      //xhttp.setRequestHeader("Authorization", "Bearer " +fetched_accessToken);
+      //xhttp.setRequestHeader("Dropbox-API-Arg", "{\"path\": \"/"+path+"\"}");
+      //xhttp.send();
 
     }
-     var callback = function(data){
-      loadData(data, callbackLoadData);
+     var callbackToken = function(data){
+	  console.log("callbackToken: " + callbackToken);
+      getAccessToken(data, callbackLoadData);
     }
-   fetchData("access_token.json", callback);
+   fetchData("access_token.json", callbackToken);
 }
 
 function addWeight(){
@@ -108,7 +110,7 @@ function addWeight(){
 
 
 }
-
+*/
 	var html= "";
     /* When the request begins */
     function onloadstarthandler(e) {
@@ -197,26 +199,29 @@ function saveDataToDropbox (jsondata, access_token){
 
 		}
 		
-function loadData(data, callback){
-	var ciphertext = data["jesuslovesyou"];
-
-	var username =   localStorage.getItem("username");
-    var password = localStorage.getItem("password");
+function loadData(data){
+    console.log(JSON.stringify(data["access_token"]));
+	var access_token = JSON.stringify(data["access_token"]);
+	console.log("original access_token: " + access_token);
+	var username = "gesab001";
+	var password = "Bdgqviid1980!loseweight";
 	var secretKey = username+password;
-    var bytes = CryptoJS.AES.decrypt(ciphertext, secretKey);
+	var ciphertext = CryptoJS.AES.encrypt(access_token, secretKey);
+	console.log("encrypted access_token: " + ciphertext);
+	//alert(ciphertext);
+	var bytes = CryptoJS.AES.decrypt(ciphertext.toString(), secretKey);
 	var decrypted_access_token = bytes.toString(CryptoJS.enc.Utf8);
-	callback(decrypted_access_token);
-
+	console.log("decrypted_access_token:" + decrypted_access_token);	
 }
 
-function fetchData(filename, callback){
-
+function fetchData(filename){
+	
 fetch(filename)
   .then((response) => response.json())
-  .then(callback);
+  .then(loadData);
   
 }
-
+fetchData("uncryptedAccessToken.json");
 
 </script>
 </html>
