@@ -34,7 +34,7 @@ function login(){
   localStorage.setItem("password_loseweight", password);
 
 }
-function getFilesFromDropbox(access_token, callback){
+function getFilesFromDropbox(key_to_dropbox, callback){
 /*https://api.dropboxapi.com/2/file_requests/list_v2 \
   --header 'Authorization: Bearer sl.BS5Avg6tbvLLQJUFJAn9Mx3siPLRZP-PwUnHBFAaT7zgOz_bC2zA8JPHzPUoRQBjlbpBu4y9q85PP96l-KZTfyeWnouZ6dXuDyuNu8UY0XcWUO0_cCpm_cpAtgAunf-aw6a20ofP-Ide' \
   --header 'Content-Type: application/json' \
@@ -50,15 +50,15 @@ function getFilesFromDropbox(access_token, callback){
 		callback(jsondata);
 	 }
    };  
-		   console.log("access_token: "+ access_token);
+		   console.log("key_to_dropbox: "+ key_to_dropbox);
 		   
       xhttp.open("POST", "https://api.dropboxapi.com/2/file_requests/list_v2", true);
-      xhttp.setRequestHeader("Authorization", "Bearer " +access_token);
+      xhttp.setRequestHeader("Authorization", "Bearer " +key_to_dropbox);
       xhttp.setRequestHeader("Content-Type", "application/json");
       xhttp.send('{}');
 
 }
-function getWeightList(callback, access_token){
+function getWeightList(callback, key_to_dropbox){
 
    var xhttp = new XMLHttpRequest();
    
@@ -73,10 +73,10 @@ function getWeightList(callback, access_token){
 		   var password = localStorage.getItem("password");
 		   var path = username +".json";
 		   console.log("path: " + path);
-		   console.log("access_token: "+ access_token);
+		   console.log("key_to_dropbox: "+ key_to_dropbox);
 		   
       xhttp.open("POST", "https://content.dropboxapi.com/2/files/download", true);
-      xhttp.setRequestHeader("Authorization", "Bearer " +access_token);
+      xhttp.setRequestHeader("Authorization", "Bearer " +key_to_dropbox);
       xhttp.setRequestHeader("Dropbox-API-Arg", "{\"path\": \"/"+path+"\"}");
       xhttp.send();
 
@@ -84,7 +84,7 @@ function getWeightList(callback, access_token){
 
 function addWeight(){
 
-   var access_token = localStorage.getItem("decrypted_access_token").replace(/"/g, "");
+   var key_to_dropbox = localStorage.getItem("decrypted_key_to_dropbox").replace(/"/g, "");
    var newWeight = document.getElementById("weight").value;
    var timestamp = Date.now();
    var newRecord = {"weight": newWeight, "timestamp": timestamp};
@@ -92,7 +92,7 @@ function addWeight(){
       var jsondata;
 	  jsondata = JSON.parse(response);
 	  jsondata["items"].push(newRecord);
-	  saveDataToDropbox (jsondata, access_token);
+	  saveDataToDropbox (jsondata, key_to_dropbox);
     };		
 	
    var checkIfFileExists = function(data){
@@ -101,15 +101,15 @@ function addWeight(){
       console.log(data);
 	  if (data.indexOf(filename)!=-1){
 	     console.log("file exists");
-		 getWeightList(callbackWeightList, access_token);
+		 getWeightList(callbackWeightList, key_to_dropbox);
 	  }else{
 	     console.log("file doesn't exists");
 		 var jsondata = [newRecord];  	
          var path = filename;		 
-		 saveDataToDropbox (path, jsondata, access_token);
+		 saveDataToDropbox (path, jsondata, key_to_dropbox);
 	  }
    }   
-   getFilesFromDropbox(access_token, checkIfFileExists);
+   getFilesFromDropbox(key_to_dropbox, checkIfFileExists);
 }
 
 	var html= "";
@@ -161,7 +161,7 @@ function addWeight(){
         console.log(html);
     }
 	
-function saveDataToDropbox (path, jsondata, access_token){
+function saveDataToDropbox (path, jsondata, key_to_dropbox){
 
 
 
@@ -187,7 +187,7 @@ function saveDataToDropbox (path, jsondata, access_token){
 
 		    client.open("post", "https://content.dropboxapi.com/2/files/upload", true);
 
-				    client.setRequestHeader("Authorization", "Bearer " + access_token); 
+				    client.setRequestHeader("Authorization", "Bearer " + key_to_dropbox); 
 				    client.setRequestHeader("Dropbox-API-Arg", "{\"path\": \"/"+path+"\",\"mode\": \"overwrite\",\"autorename\": true,\"mute\": false,\"strict_conflict\": false}");
 				    client.setRequestHeader("Content-Type", "application/octet-stream");
 
@@ -198,19 +198,19 @@ function saveDataToDropbox (path, jsondata, access_token){
 		
 function decryptAccessToken(data){
     console.log(JSON.stringify(data["jesuslovesyou"]));
-	var access_token = JSON.stringify(data["jesuslovesyou"]);
-	console.log("original access_token: " + access_token);
+	var key_to_dropbox = JSON.stringify(data["jesuslovesyou"]);
+	console.log("original key_to_dropbox: " + key_to_dropbox);
 	var username = localStorage.getItem("username_loseweight");
 	var password = localStorage.getItem("password_loseweight");
 	var secretKey = username+password;
 	console.log("secretKey: " + secretKey);
-	var ciphertext = access_token.replace(/"/g, "");//CryptoJS.AES.encrypt(access_token, secretKey);
-	console.log("encrypted access_token: " + ciphertext);
+	var ciphertext = key_to_dropbox.replace(/"/g, "");//CryptoJS.AES.encrypt(key_to_dropbox, secretKey);
+	console.log("encrypted key_to_dropbox: " + ciphertext);
 	//alert(ciphertext);
 	var bytes = CryptoJS.AES.decrypt(ciphertext.toString(), secretKey);
-	var decrypted_access_token = bytes.toString(CryptoJS.enc.Utf8);
-	console.log("decrypted_access_token:" + decrypted_access_token);	
-	localStorage.setItem("decrypted_access_token", decrypted_access_token);
+	var decrypted_key_to_dropbox = bytes.toString(CryptoJS.enc.Utf8);
+	console.log("decrypted_key_to_dropbox:" + decrypted_key_to_dropbox);	
+	localStorage.setItem("decrypted_key_to_dropbox", decrypted_key_to_dropbox);
 }
 
 function getAccessToken(filename){
@@ -220,7 +220,7 @@ fetch(filename)
   .then(decryptAccessToken);
   
 }
-getAccessToken("access_token.json");
+getAccessToken("key_to_dropbox.json");
 
 </script>
 </html>
