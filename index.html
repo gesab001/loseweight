@@ -11,7 +11,7 @@
 
 
 <input type="text" id="username" placeholder="Username"/>
-<input type="password" id="password" value="Bdgqviid1980!loseweight" placeholder="Password"/>
+<input type="password" id="password" value="" placeholder="Password"/>
 <button onclick="login()">LOGIN</button>
 
 
@@ -32,6 +32,8 @@ function login(){
   password = document.getElementById("password").value;
   localStorage.setItem("username_loseweight", username);
   localStorage.setItem("password_loseweight", password);
+  getAccessToken("access_token.json");
+
 
 }
 function getFilesFromDropbox(key_to_dropbox, callback){
@@ -220,7 +222,6 @@ fetch(filename)
   .then(decryptAccessToken);
   
 }
-getAccessToken("access_token.json");
 
 </script>
 </html>
