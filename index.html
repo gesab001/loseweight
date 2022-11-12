@@ -118,7 +118,7 @@ function getFileContentFromDropboxFile(callback, key_to_dropbox, path){
 }
 
 function addWeight(){
-   var filename = localStorage.getItem("username") + ".json";
+   var filename = localStorage.getItem("username_loseweight") + ".json";
    var path = filename;		
    var key_to_dropbox = localStorage.getItem("decrypted_key_to_dropbox").replace(/"/g, "");
    var newWeight = document.getElementById("weight").value;
@@ -128,7 +128,7 @@ function addWeight(){
       var jsondata;
 	  jsondata = JSON.parse(response);
 	  jsondata["items"].push(newRecord);
-      var path = localStorage.getItem("username") + ".json";;		
+      var path = localStorage.getItem("username_loseweight") + ".json";;		
       saveDataToDropbox (path, jsondata, key_to_dropbox);
     };		
 	
