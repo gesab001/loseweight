@@ -201,8 +201,7 @@ function saveDataToDropbox (path, jsondata, key_to_dropbox){
 
 
 
-	       var data = jsondata;
-		   data = JSON.stringify(data);
+		   var data = JSON.stringify(jsondata,  null, 2);
 		   //console.log("path: " + path);
 		   //console.log("data: " + data);
 
