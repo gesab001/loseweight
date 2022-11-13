@@ -1,8 +1,14 @@
 <html>
 
 <head>
-
-<script src="aes.js"></script>
+<head>
+    <title>Lose Weight</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@7/dist/polyfill.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropbox.js/10.34.0/Dropbox-sdk.min.js"></script>
+    <script src="/utils.js"></script>
+</head>
 </head>
 
 <body>
@@ -10,13 +16,31 @@
 <h1>Lose Weight</h1>
 
 
-<input type="text" id="username" placeholder="Username"/>
-<input type="password" id="password" value="" placeholder="Password"/>
-<button onclick="login()">LOGIN</button>
+    <!-- Example description and UI -->
+    <section class="container main">
+        <p>This example shows how to use PKCE in the browser</p>
+        <div id="pre-auth-section" style="display:none;">
+            <button onClick="doAuth()">Start PKCE Auth Flow</button>
+
+            <p class="info">Once authenticated, it will use the access token to list the files in your root directory.</p>
+        </div>
+
+        <div id="authed-section" style="display:none;">
+            <p>You have successfully authenticated. Below are the contents of your root directory. They were fetched using the SDK and access token.</p>
+			
+			<input type="text" id="username" placeholder="Username"/>
+			<input type="password" id="password" value="" placeholder="Password"/>
+			<button onclick="login()">LOGIN</button>
 
 
-<input id="weight" type="number" step="0.01" placeholder="add weight"/>
-<button onclick="addWeight()">submit</button>
+			<input id="weight" type="number" step="0.01" placeholder="add weight"/>
+			<button onclick="addWeight()">submit</button>
+
+            <ul id="files"></ul>
+        </div>
+    </section>
+	
+
 
 
 
@@ -26,13 +50,10 @@
 
 var username;
 var password;
-var client_id = "U2FsdGVkX18aKMu7eszkGlCTGL+WoxlZGoGT7w7AzNE=";
-var client_secret = "U2FsdGVkX1/RBPVjqWeYBdoE2AoPPdBWgxGwjxKbxxw=";
-var refresh_token = "U2FsdGVkX1/qAEskw7xXAfR1a0i7HRh8fhs2q/xfZBeWqfrQYKfMmQUFihSq6zu0QQMovIDmlwx70hu5FyXxLSVXQRq96zQxr+i0Ax1aD8aSEjAQhs+pK1VSzhfYTl3N";
 
 function decrypt(name, _ciphertext){
 	var ciphertext = _ciphertext.replace(/"/g, "");//CryptoJS.AES.encrypt(key_to_dropbox, secretKey);
-	console.log("ciphertext: " + ciphertext);
+	console.log(name + " ciphertext: " + ciphertext);
 	//alert(ciphertext);
 	username = localStorage.getItem("username_loseweight");
     password = localStorage.getItem("password_loseweight"); 
@@ -40,33 +61,13 @@ function decrypt(name, _ciphertext){
 	console.log("secretKey: " + secretKey);
 	var bytes = CryptoJS.AES.decrypt(ciphertext.toString(), secretKey);
 	var decryptedtext = bytes.toString(CryptoJS.enc.Utf8);
+	decryptedtext = decryptedtext.replace(/ /g, "");
 	console.log(name + ": " + decryptedtext);
 	return decryptedtext;
 }
 function getAccessToken(callback){
-  url = "https://api.dropbox.com/oauth2/token"
-  jsondata =  {
-           "grant_type": "refresh_token",
-           "refresh_token": decrypt("refresh_token", refresh_token),
-           "client_id": decrypt("client_id", client_id),
-           "client_secret": decrypt("client_secret", client_secret)
-  }
-  console.log(jsondata);
-       var xhttp = new XMLHttpRequest();
-   
-   xhttp.onreadystatechange = function() {
-     if (this.readyState == 4 && this.status == 200){
-	    console.log(this.responseText);
-		var access_token = JSON.parse(this.responseText)['access_token'];
-		callback(access_token);
-	 }
-   };  
-		   
-      xhttp.open("POST", url, true);
-      xhttp.setRequestHeader("Content-Type", "application/json");
-      xhttp.send(JSON.stringify(jsondata));
-
-
+   var token = localStorage.getItem("access_token");
+   callback(token);
 }
   
 function autoLogin(){
@@ -156,7 +157,7 @@ function getFileContentFromDropboxFile(callback, key_to_dropbox, path){
 function addWeight(){
    var filename = localStorage.getItem("username_loseweight") + ".json";
    var path = filename;		
-   var key_to_dropbox = localStorage.getItem("decrypted_key_to_dropbox").replace(/"/g, "");
+   var key_to_dropbox = localStorage.getItem("access_token");
    var newWeight = document.getElementById("weight").value;
    var timestamp = Date.now();
    var newRecord = {"weight": newWeight, "timestamp": timestamp};
@@ -182,11 +183,8 @@ function addWeight(){
 	  }
    }   
    
+   searchForFileInDropbox(filename, key_to_dropbox, checkIfFileExists);
    
-   var callbackAccessToken = function(key_to_dropbox){
-     searchForFileInDropbox(filename, key_to_dropbox, checkIfFileExists);
-   }
-   getAccessToken(callbackAccessToken);
 }
 
 	var html= "";
@@ -273,4 +271,82 @@ function saveDataToDropbox (path, jsondata, key_to_dropbox){
 		}
 		
 </script>
+
+    <!-- Scripts to run example -->
+    <script>
+        var REDIRECT_URI = 'http://localhost:8000';
+		  console.log("window.location.href: " + window.location.href);
+		   console.log("window.location.hostname: " + window.location.hostname); 
+		if (window.location.hostname!="localhost"){
+		  REDIRECT_URI = 'https://gesab001.github.io/loseweight';		
+		}else{
+		  console.log("its a localhost");
+		}
+	    console.log("REDIRECT_URI: " + REDIRECT_URI);
+        var CLIENT_ID = '3033hqz2ffx2y44';
+        var dbxAuth = new Dropbox.DropboxAuth({
+            clientId: CLIENT_ID,
+        });
+
+        // Parses the url and gets the access token if it is in the urls hash
+        function getCodeFromUrl() {
+            return utils.parseQueryString(window.location.search).code;
+        }
+
+        // If the user was just redirected from authenticating, the urls hash will
+        // contain the access token.
+        function hasRedirectedFromAuth() {
+            return !!getCodeFromUrl();
+        }
+
+        // Render a list of items to #files
+        function renderItems(items) {
+            var filesContainer = document.getElementById('files');
+            items.forEach(function(item) {
+                var li = document.createElement('li');
+                li.innerHTML = item.name;
+                filesContainer.appendChild(li);
+            });
+        }
+
+        // This example keeps both the authenticated and non-authenticated setions
+        // in the DOM and uses this function to show/hide the correct section.
+        function showPageSection(elementId) {
+            document.getElementById(elementId).style.display = 'block';
+        }
+
+        function doAuth() {
+            dbxAuth.getAuthenticationUrl(REDIRECT_URI, undefined, 'code', 'offline', undefined, undefined, true)
+                .then(authUrl => {
+                    window.sessionStorage.clear();
+                    window.sessionStorage.setItem("codeVerifier", dbxAuth.codeVerifier);
+                    window.location.href = authUrl;
+                })
+                .catch((error) => console.error(error));
+        };
+
+        if (hasRedirectedFromAuth()) {
+            showPageSection('authed-section');
+            dbxAuth.setCodeVerifier(window.sessionStorage.getItem('codeVerifier'));
+            dbxAuth.getAccessTokenFromCode(REDIRECT_URI, getCodeFromUrl())
+                .then((response) => {
+                    dbxAuth.setAccessToken(response.result.access_token);
+					localStorage.setItem("access_token", response.result.access_token);
+                    var dbx = new Dropbox.Dropbox({
+                        auth: dbxAuth
+                    });
+                    return dbx.filesListFolder({
+                        path: ''
+                    });
+                })
+                .then((response) => {
+                    renderItems(response.result.entries);
+                })
+                .catch((error) => {
+                    console.error(error)
+                });
+        } else {
+            showPageSection('pre-auth-section');
+        }
+    </script>
 </html>
