@@ -169,7 +169,7 @@ function addWeight(){
 	  jsondata = JSON.parse(response);
 	  jsondata["items"].push(newRecord);
 	  var recordList = document.getElementById("records");
-	  recordsList.innerHTML = "";
+	  recordList.innerHTML = "";
 	  for (var x=0; x<jsondata["items"].length; x++){
 	     var weight = jsondata["items"][x]["weight"];
 		 var timestamp = jsondata["items"][x]["timestamp"];
