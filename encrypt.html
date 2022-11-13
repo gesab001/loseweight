@@ -1,0 +1,33 @@
+<html>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+
+
+<body>
+
+<h1>ENCRYPTION</h1>
+<div style="word-wrap: break-word;">
+<h2 id="access_token"></h2>
+</div>
+  <input id="texttoencrypt" name="texttoencrypt" type="text" value="" placeholder="text to encrypt"/>
+  <input id="secretkey" name="secretkey" type="text" value="" placeholder="secretkey"/>
+
+  <button id="encryptButton" onclick="encrypt()">encrypt</button>
+  
+  <div id="result"></div>
+</body>
+
+<script>
+
+
+
+function encrypt(){
+	var texttoencrypt = document.getElementById("texttoencrypt").value;
+	var secretKey = document.getElementById("secretkey").value;
+	var ciphertext = CryptoJS.AES.encrypt(texttoencrypt, secretKey);
+	document.getElementById("result").innerHTML = ciphertext;
+}
+
+
+</script>
+</html>

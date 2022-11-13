@@ -26,7 +26,49 @@
 
 var username;
 var password;
+var client_id = "U2FsdGVkX18aKMu7eszkGlCTGL+WoxlZGoGT7w7AzNE=";
+var client_secret = "U2FsdGVkX1/RBPVjqWeYBdoE2AoPPdBWgxGwjxKbxxw=";
+var refresh_token = "U2FsdGVkX1/qAEskw7xXAfR1a0i7HRh8fhs2q/xfZBeWqfrQYKfMmQUFihSq6zu0QQMovIDmlwx70hu5FyXxLSVXQRq96zQxr+i0Ax1aD8aSEjAQhs+pK1VSzhfYTl3N";
 
+function decrypt(name, _ciphertext){
+	var ciphertext = _ciphertext.replace(/"/g, "");//CryptoJS.AES.encrypt(key_to_dropbox, secretKey);
+	console.log("ciphertext: " + ciphertext);
+	//alert(ciphertext);
+	username = localStorage.getItem("username_loseweight");
+    password = localStorage.getItem("password_loseweight"); 
+	var secretKey = username + password;
+	console.log("secretKey: " + secretKey);
+	var bytes = CryptoJS.AES.decrypt(ciphertext.toString(), secretKey);
+	var decryptedtext = bytes.toString(CryptoJS.enc.Utf8);
+	console.log(name + ": " + decryptedtext);
+	return decryptedtext;
+}
+function getAccessToken(callback){
+  url = "https://api.dropbox.com/oauth2/token"
+  jsondata =  {
+           "grant_type": "refresh_token",
+           "refresh_token": decrypt("refresh_token", refresh_token),
+           "client_id": decrypt("client_id", client_id),
+           "client_secret": decrypt("client_secret", client_secret)
+  }
+  console.log(jsondata);
+       var xhttp = new XMLHttpRequest();
+   
+   xhttp.onreadystatechange = function() {
+     if (this.readyState == 4 && this.status == 200){
+	    console.log(this.responseText);
+		var access_token = JSON.parse(this.responseText)['access_token'];
+		callback(access_token);
+	 }
+   };  
+		   
+      xhttp.open("POST", url, true);
+      xhttp.setRequestHeader("Content-Type", "application/json");
+      xhttp.send(JSON.stringify(jsondata));
+
+
+}
+  
 function autoLogin(){
   if (localStorage.getItem("username_loseweight") !== null) {
 
@@ -34,7 +76,6 @@ function autoLogin(){
     password = localStorage.getItem("password_loseweight"); 
 	document.getElementById("username").value = username ;
     document.getElementById("password").value = password ;
-    getAccessToken("access_token.json");
 	}
 
 
@@ -47,11 +88,6 @@ function login(){
     password = document.getElementById("password").value;
     localStorage.setItem("username_loseweight", username);
     localStorage.setItem("password_loseweight", password);
- 
-
-  getAccessToken("access_token.json");
-
-
 }
 function searchForFileInDropbox(filename, key_to_dropbox, callback){
      var xhttp = new XMLHttpRequest();
@@ -145,7 +181,12 @@ function addWeight(){
 		 saveDataToDropbox (path, jsondata, key_to_dropbox);
 	  }
    }   
-   searchForFileInDropbox(filename, key_to_dropbox, checkIfFileExists);
+   
+   
+   var callbackAccessToken = function(key_to_dropbox){
+     searchForFileInDropbox(filename, key_to_dropbox, checkIfFileExists);
+   }
+   getAccessToken(callbackAccessToken);
 }
 
 	var html= "";
@@ -231,30 +272,5 @@ function saveDataToDropbox (path, jsondata, key_to_dropbox){
 
 		}
 		
-function decryptAccessToken(data){
-    console.log(JSON.stringify(data["jesuslovesyou"]));
-	var key_to_dropbox = JSON.stringify(data["jesuslovesyou"]);
-	console.log("original key_to_dropbox: " + key_to_dropbox);
-	var username = localStorage.getItem("username_loseweight");
-	var password = localStorage.getItem("password_loseweight");
-	var secretKey = username+password;
-	console.log("secretKey: " + secretKey);
-	var ciphertext = key_to_dropbox.replace(/"/g, "");//CryptoJS.AES.encrypt(key_to_dropbox, secretKey);
-	console.log("encrypted key_to_dropbox: " + ciphertext);
-	//alert(ciphertext);
-	var bytes = CryptoJS.AES.decrypt(ciphertext.toString(), secretKey);
-	var decrypted_key_to_dropbox = bytes.toString(CryptoJS.enc.Utf8);
-	console.log("decrypted_key_to_dropbox:" + decrypted_key_to_dropbox);	
-	localStorage.setItem("decrypted_key_to_dropbox", decrypted_key_to_dropbox);
-}
-
-function getAccessToken(filename){
-	
-fetch(filename)
-  .then((response) => response.json())
-  .then(decryptAccessToken);
-  
-}
-
 </script>
 </html>
