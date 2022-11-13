@@ -37,6 +37,9 @@
 			<button onclick="addWeight()">submit</button>
 
             <ul id="files"></ul>
+
+            <ul id="records"></ul>
+			
         </div>
     </section>
 	
@@ -165,6 +168,21 @@ function addWeight(){
       var jsondata;
 	  jsondata = JSON.parse(response);
 	  jsondata["items"].push(newRecord);
+	  var recordList = document.getElementById("records");
+	  for (var x=0; x<jsondata["items"].length; x++){
+	     var weight = jsondata["items"][x]["weight"];
+		 var timestamp = jsondata["items"][x]["timestamp"];
+		 var dateFormat= new Date(timestamp);
+		 var dateString = dateFormat.getDate()+
+           "/"+(dateFormat.getMonth()+1)+
+           "/"+dateFormat.getFullYear()+
+           " "+dateFormat.getHours()+
+           ":"+dateFormat.getMinutes()+
+           ":"+dateFormat.getSeconds();
+	     var li = document.createElement("LI");
+		 li.innerHTML =  dateString +": " + weight;
+		 recordList.appendChild(li);
+	  }
       var path = localStorage.getItem("username_loseweight") + ".json";;		
       saveDataToDropbox (path, jsondata, key_to_dropbox);
     };		
